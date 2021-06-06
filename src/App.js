@@ -1,23 +1,44 @@
-import logo from './logo.svg';
+import React, {useState, useEffect} from 'react';
+import IssueList from './IssueList.js';
 import './App.css';
 
+
+let oneTime = false;
 function App() {
+  const [pageNumber, setPageNumber] = useState(0);
+  const fetchMore = (async () => {
+    setPageNumber((pageNumber) => pageNumber+1);
+    oneTime = false;
+  });
+
+  const onScroll = e => {
+    const {
+      clientHeight,
+      scrollHeight,
+      scrollTop,
+    } = e.target.scrollingElement;
+    if (scrollTop + clientHeight >= scrollHeight && !oneTime) {
+      oneTime = true;
+      fetchMore();
+    }
+  }
+
+  useEffect(()=>{
+    document.addEventListener("scroll",onScroll);
+    const fetchMore = (async () => {
+      setPageNumber((pageNumber) => pageNumber+1);
+      oneTime = false;
+    });
+    fetchMore();
+  }, []);
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    
+    {
+      pageNumber ? <IssueList pageNumber={pageNumber}/> : 'Loading'
+    }
+    
     </div>
   );
 }
